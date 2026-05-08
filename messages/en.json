@@ -1,0 +1,29 @@
+{
+  "Dashboard": {
+    "title": "Dashboard",
+    "overview": "Dashboard Overview",
+    "activeDisplays": "Active Displays",
+    "uptime": "Uptime",
+    "contentSync": "Content Sync",
+    "systemHealth": "System Health",
+    "realTimeStatus": "Real-time status of your signage network.",
+    "searchPlaceholder": "Search..."
+  },
+  "Common": {
+    "quickActions": "Quick Actions",
+    "newLead": "New Lead",
+    "newEnquiry": "New Enquiry",
+    "createQuotation": "Create Quotation",
+    "newProject": "New Project",
+    "settings": "Settings",
+    "notifications": "Notifications",
+    "help": "Help Center",
+    "history": "Activity History",
+    "calendar": "Calendar & Tasks"
+  },
+  "Language": {
+    "en": "English",
+    "hi": "Hindi",
+    "ar": "Arabic"
+  }
+}

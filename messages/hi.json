@@ -1,0 +1,29 @@
+{
+  "Dashboard": {
+    "title": "डैशबोर्ड",
+    "overview": "डैशबोर्ड अवलोकन",
+    "activeDisplays": "सक्रिय डिस्प्ले",
+    "uptime": "अपटाइम",
+    "contentSync": "सामग्री सिंक",
+    "systemHealth": "सिस्टम स्वास्थ्य",
+    "realTimeStatus": "आपके साइनेज नेटवर्क की रीयल-टाइम स्थिति।",
+    "searchPlaceholder": "खोजें..."
+  },
+  "Common": {
+    "quickActions": "त्वरित कार्रवाइयां",
+    "newLead": "नया लीड",
+    "newEnquiry": "नई पूछताछ",
+    "createQuotation": "कोटेशन बनाएं",
+    "newProject": "नया प्रोजेक्ट",
+    "settings": "सेटिंग्स",
+    "notifications": "सूचनाएं",
+    "help": "सहायता केंद्र",
+    "history": "गतिविधि इतिहास",
+    "calendar": "कैलेंडर और कार्य"
+  },
+  "Language": {
+    "en": "अंग्रेजी",
+    "hi": "हिंदी",
+    "ar": "अरबी"
+  }
+}

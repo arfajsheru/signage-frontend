@@ -1,0 +1,29 @@
+{
+  "Dashboard": {
+    "title": "لوحة القيادة",
+    "overview": "نظرة عامة على لوحة القيادة",
+    "activeDisplays": "الشاشات النشطة",
+    "uptime": "وقت التشغيل",
+    "contentSync": "مزامنة المحتوى",
+    "systemHealth": "صحة النظام",
+    "realTimeStatus": "حالة شبكة اللافتات الخاصة بك في الوقت الفعلي.",
+    "searchPlaceholder": "بحث..."
+  },
+  "Common": {
+    "quickActions": "إجراءات سريعة",
+    "newLead": "عميل محتمل جديد",
+    "newEnquiry": "استفسار جديد",
+    "createQuotation": "إنشاء عرض سعر",
+    "newProject": "مشروع جديد",
+    "settings": "الإعدادات",
+    "notifications": "الإشعارات",
+    "help": "مركز المساعدة",
+    "history": "سجل النشاط",
+    "calendar": "التقويم والمهام"
+  },
+  "Language": {
+    "en": "الإنجليزية",
+    "hi": "الهندية",
+    "ar": "العربية"
+  }
+}
