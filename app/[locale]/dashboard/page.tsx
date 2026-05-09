@@ -1,50 +1,106 @@
+"use client"
+
+import { motion } from "framer-motion"
+import { Construction, Rocket, Cog } from "lucide-react"
+
 export default function DashboardPage() {
   return (
-    <div className="flex flex-1 flex-col gap-6 p-6 pt-0">
-      <div className="grid auto-rows-min gap-6 md:grid-cols-3">
-        <div className="aspect-video rounded-2xl bg-muted/50 border border-border/50 flex flex-col items-center justify-center p-6 text-center">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
-          </div>
-          <h3 className="text-sm font-medium">Active Displays</h3>
-          <p className="text-2xl font-bold mt-1">12</p>
+    <div className="flex h-[80vh] w-full items-center justify-center p-6">
+      <div className="relative flex flex-col items-center text-center">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 -z-10 flex items-center justify-center overflow-visible">
+          <motion.div
+            className="absolute h-64 w-64 rounded-full bg-primary/10 blur-3xl"
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+          <motion.div
+            className="absolute h-96 w-96 rounded-full bg-primary/5 blur-3xl"
+            animate={{
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
         </div>
-        <div className="aspect-video rounded-2xl bg-muted/50 border border-border/50 flex flex-col items-center justify-center p-6 text-center">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <div className="h-2 w-2 rounded-full bg-green-500" />
+
+        {/* Icon Animation */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="relative mb-6"
+        >
+          <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/5 border border-primary/10 shadow-sm">
+            <Construction className="h-7 w-7 text-primary/80" />
+            
+            <motion.div
+              className="absolute -top-2 -right-2 flex h-7 w-7 items-center justify-center rounded-full bg-background border border-border shadow-sm"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Rocket className="h-3.5 w-3.5 text-amber-500/80" />
+            </motion.div>
+
+            <motion.div
+              className="absolute -bottom-1 -left-3 flex h-6 w-6 items-center justify-center rounded-full bg-background border border-border shadow-sm"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+            >
+              <Cog className="h-3 w-3 text-primary/60" />
+            </motion.div>
           </div>
-          <h3 className="text-sm font-medium">Uptime</h3>
-          <p className="text-2xl font-bold mt-1">99.9%</p>
+        </motion.div>
+
+        {/* Text Content */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-2"
+        >
+          <h1 className="text-xl font-semibold tracking-tight text-foreground/90">
+            Module Under Development
+          </h1>
+          <p className="mx-auto max-w-[280px] text-sm text-muted-foreground/80 leading-relaxed">
+            We are currently refining this module to provide a seamless ERP experience. 
+            Expected deployment in the next release.
+          </p>
+        </motion.div>
+
+        {/* Progress bar placeholder */}
+        <div className="mt-8 w-48 h-1 bg-muted/40 rounded-full overflow-hidden">
+          <motion.div 
+            className="h-full bg-primary/60"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{ 
+              duration: 2.5, 
+              repeat: Infinity, 
+              ease: "linear" 
+            }}
+            style={{ width: "100%" }}
+          />
         </div>
-        <div className="aspect-video rounded-2xl bg-muted/50 border border-border/50 flex flex-col items-center justify-center p-6 text-center">
-          <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-            <div className="h-2 w-2 rounded-full bg-blue-500" />
-          </div>
-          <h3 className="text-sm font-medium">Content Sync</h3>
-          <p className="text-2xl font-bold mt-1">Synced</p>
-        </div>
-      </div>
-      <div className="min-h-[400px] flex-1 rounded-2xl bg-muted/30 border border-border/50 md:min-h-min p-8 relative overflow-hidden">
-        <div className="relative z-10">
-          <h2 className="text-xl font-semibold tracking-tight">System Health</h2>
-          <p className="text-muted-foreground text-sm mt-1">Real-time status of your signage network.</p>
-          
-          <div className="mt-8 grid gap-4 max-w-2xl">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-12 rounded-lg bg-background border border-border/40 flex items-center px-4 justify-between animate-in fade-in slide-in-from-bottom-2 duration-500" style={{ animationDelay: `${i * 100}ms` }}>
-                <div className="flex items-center gap-3">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <span className="text-sm font-medium">Terminal Node {i}00{i}</span>
-                </div>
-                <span className="text-xs text-muted-foreground">Connected</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        {/* Background Decoration */}
-        <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 -ml-20 -mb-20 h-64 w-64 bg-primary/5 rounded-full blur-3xl" />
+
+        <motion.div
+          className="mt-4 text-[10px] font-bold text-primary/40 uppercase tracking-[0.3em]"
+          animate={{ opacity: [0.3, 0.6, 0.3] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          System Evolution in Progress
+        </motion.div>
       </div>
     </div>
   )
