@@ -80,6 +80,10 @@ const data = {
       icon: <Printer />,
       items: [
         {
+          title: "Created",
+          url: "/production/print/created",
+        },
+        {
           title: "Designing",
           url: "/production/print/designing",
         },
@@ -102,6 +106,10 @@ const data = {
       url: "#",
       icon: <Hammer />,
       items: [
+        {
+          title: "Created",
+          url: "/production/signage/created",
+        },
         {
           title: "Designing",
           url: "/production/signage/designing",

@@ -27,11 +27,11 @@ const ORBS = [
   { size: 320, x: "-8%", y: "50%", duration: 22, delay: 9 },
 ]
 
-const STARS = Array.from({ length: 40 }, (_, i) => ({
+const STARS = Array.from({ length: 150 }, (_, i) => ({
   id: i,
   x: Math.random() * 100,
   y: Math.random() * 100,
-  size: Math.random() * 1.5 + 0.5,
+  size: Math.random() * 2 + 0.5,
   duration: Math.random() * 3 + 2,
   delay: Math.random() * 5,
 }))
@@ -238,7 +238,7 @@ export default function LoginPage() {
 
       {/* CARD */}
       <motion.div
-        className="relative z-10 w-full max-w-md px-4"
+        className="relative z-10 w-full max-w-lg px-4"
         initial={{ opacity: 0, y: 24, scale: 0.97 }}
         animate={{
           opacity: 1,
@@ -268,14 +268,6 @@ export default function LoginPage() {
             `,
           }}
         >
-          {/* Spotlight Effect */}
-          <div
-            className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            style={{
-              background: `radial-gradient(600px circle at ${mousePos.x * 100}% ${mousePos.y * 100}%, color-mix(in oklch, var(--primary) 15%, transparent), transparent 40%)`,
-            }}
-          />
-
           {/* Rainbow beam 1 — clockwise */}
           <motion.div
             className="pointer-events-none absolute"
