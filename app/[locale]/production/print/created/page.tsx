@@ -1,4 +1,6 @@
-import { Button } from "@/components/ui/button"
+"use client"
+
+import { useState } from "react"
 import { Plus, Filter, Download } from "lucide-react"
 import {
   Card,
@@ -7,27 +9,36 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { CreateProjectModal } from "@/components/production/createProjectModal"
+import { Button } from "@/components/ui/button"
 
 export default function PrintCreatedPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   return (
     <div className="space-y-6">
+      <CreateProjectModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        type="print" 
+      />
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Print Production: Created</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-xl font-bold tracking-tight">Print Production: Created</h1>
+          <p className="text-sm text-muted-foreground">
             Manage and start newly created print projects.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
+          <Button variant="outline" className="h-10">
             <Filter className="mr-2 h-4 w-4" />
             Filter
           </Button>
-          <Button variant="outline" size="sm">
+          <Button variant="outline" className="h-10">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button size="sm">
+          <Button className="h-10" onClick={() => setIsModalOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Create New Print Job
           </Button>
@@ -62,7 +73,7 @@ export default function PrintCreatedPage() {
               <p className="mb-4 mt-2 text-sm text-muted-foreground">
                 You haven&apos;t created any print projects yet.
               </p>
-              <Button size="sm">Add New Project</Button>
+              <Button className="h-10" onClick={() => setIsModalOpen(true)}>Add New Project</Button>
             </div>
           </div>
         </CardContent>
