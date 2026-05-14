@@ -16,6 +16,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { useState, useEffect } from "react"
 import { User } from "@/types/auth"
+import { MapModal } from "@/components/map/MapModal"
+import { MapPin } from "lucide-react"
 
 interface CreateProjectModalProps {
   isOpen: boolean
@@ -30,10 +32,13 @@ export function CreateProjectModal({ isOpen, onClose, type }: CreateProjectModal
   const [formData, setFormData] = useState({
     name: "",
     description: "",
+    address: "",
     businessTypeId: "",
     stageTypeId: "",
     channelPartnerId: "",
   })
+
+  const [isMapOpen, setIsMapOpen] = useState(false)
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user")
@@ -70,8 +75,9 @@ export function CreateProjectModal({ isOpen, onClose, type }: CreateProjectModal
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <AnimatePresence>
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <AnimatePresence>
         {isOpen && (
           <DialogContent 
             forceMount
@@ -116,6 +122,27 @@ export function CreateProjectModal({ isOpen, onClose, type }: CreateProjectModal
                   value={formData.name}
                   onChange={(e) => handleInputChange("name", e.target.value)}
                 />
+
+                <div className="space-y-2 relative">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="address" className="text-sm font-bold">Project Address</Label>
+                    <button
+                      type="button"
+                      onClick={() => setIsMapOpen(true)}
+                      className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-md transition-colors"
+                    >
+                      <MapPin className="h-3 w-3" />
+                      Open Map
+                    </button>
+                  </div>
+                  <StudioInput
+                    id="address"
+                    placeholder="Enter or select project address..."
+                    className="h-10 bg-muted/30 border-border/40 focus:bg-background transition-all"
+                    value={formData.address}
+                    onChange={(e) => handleInputChange("address", e.target.value)}
+                  />
+                </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
@@ -182,5 +209,11 @@ export function CreateProjectModal({ isOpen, onClose, type }: CreateProjectModal
         )}
       </AnimatePresence>
     </Dialog>
-  )
+    <MapModal 
+      isOpen={isMapOpen} 
+      onClose={() => setIsMapOpen(false)} 
+      onLocationSelect={(addr) => handleInputChange("address", addr)} 
+    />
+  </>
+)
 }
