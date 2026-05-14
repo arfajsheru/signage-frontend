@@ -27,6 +27,7 @@ import {
   Settings,
   GalleryVerticalEnd,
   AudioLines,
+  Palette,
 } from "lucide-react"
 
 // This is sample data.
@@ -224,6 +225,11 @@ const data = {
       name: "Settings",
       url: "/settings",
       icon: <Settings />,
+    },
+    {
+      name: "Theme Showcase",
+      url: "/theme",
+      icon: <Palette />,
     },
   ],
 }

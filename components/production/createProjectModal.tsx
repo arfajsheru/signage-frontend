@@ -1,19 +1,11 @@
 "use client"
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import ButtonShineHover from "@/components/shadcn-studio/button/button-41"
-import { motion, AnimatePresence } from "framer-motion"
+import { BaseModal } from "@/components/comman/BaseModal"
 import { useGetBusinessTypes, useGetStageTypes, useGetChannelPartners } from "@/hooks/use-dropdown"
 import SearchSelect from "@/components/shadcn-studio/combobox/search-select"
 import { StudioInput } from "@/components/shadcn-studio/input/studio-input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
+import { TextArea } from "@/components/shadcn-studio/textarea/TextArea"
 import { useState, useEffect } from "react"
 import { User } from "@/types/auth"
 import { MapModal } from "@/components/map/MapModal"
@@ -76,139 +68,95 @@ export function CreateProjectModal({ isOpen, onClose, type }: CreateProjectModal
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <AnimatePresence>
-        {isOpen && (
-          <DialogContent 
-            forceMount
-            className="sm:max-w-[500px] p-0 border-none bg-transparent shadow-none"
-          >
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ 
-                opacity: 1, 
-                scale: 1, 
-                y: 0,
-                transition: { 
-                  type: "spring", 
-                  damping: 20, 
-                  stiffness: 300,
-                  duration: 0.3 
-                } 
-              }}
-              exit={{ 
-                opacity: 0, 
-                scale: 0.95, 
-                y: 10,
-                transition: { duration: 0.2 } 
-              }}
-              className="p-6 border border-border/50 bg-background shadow-2xl rounded-2xl relative overflow-hidden"
-            >
-              <DialogHeader className="space-y-3">
-                <DialogTitle className="text-2xl font-black tracking-tight">
-                  Create New <span className="capitalize">{type}</span> Job
-                </DialogTitle>
-                <DialogDescription className="text-sm text-muted-foreground leading-relaxed">
-                  Fill in the details below to initialize a new production project for the {type} module.
-                </DialogDescription>
-              </DialogHeader>
+      <BaseModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={`Create New ${type === 'signage' ? 'Signage' : 'Print'} Job`}
+        description={`Fill in the details below to initialize a new production project for the ${type} module.`}
+        size="xl"
+        primaryButtonText="Submit"
+        secondaryButtonText="Cancel"
+        onPrimaryAction={() => {
+          // TODO: handle submit
+          console.log("Submitting form:", formData)
+          onClose()
+        }}
+      >
+        <div className="space-y-5 py-2">
+          <StudioInput
+            id="project-name"
+            label="Project Name"
+            placeholder="Enter project name..."
+            className="h-10 bg-muted/30 border-border/40 focus:bg-background transition-all"
+            value={formData.name}
+            onChange={(e) => handleInputChange("name", e.target.value)}
+          />
 
-              <div className="py-6 space-y-5 border-y border-dashed border-border/60 my-6">
-                <StudioInput
-                  id="project-name"
-                  label="Project Name"
-                  placeholder="Enter project name..."
-                  className="h-10 bg-muted/30 border-border/40 focus:bg-background transition-all"
-                  value={formData.name}
-                  onChange={(e) => handleInputChange("name", e.target.value)}
-                />
+          <div className="space-y-2 relative">
+            <div className="flex justify-between items-center mb-[-0.5rem] relative z-10">
+              <button
+                type="button"
+                onClick={() => setIsMapOpen(true)}
+                className="absolute right-0 top-0 text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-md transition-colors"
+              >
+                <MapPin className="h-3 w-3" />
+                Open Map
+              </button>
+            </div>
+            <TextArea
+              id="address"
+              label="Project Address"
+              placeholder="Enter or select project address..."
+              className="min-h-[60px] bg-muted/30 border-border/40 focus:bg-background transition-all resize-none"
+              value={formData.address}
+              onChange={(e) => handleInputChange("address", e.target.value)}
+            />
+          </div>
 
-                <div className="space-y-2 relative">
-                  <div className="flex justify-between items-center">
-                    <Label htmlFor="address" className="text-sm font-bold">Project Address</Label>
-                    <button
-                      type="button"
-                      onClick={() => setIsMapOpen(true)}
-                      className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-md transition-colors"
-                    >
-                      <MapPin className="h-3 w-3" />
-                      Open Map
-                    </button>
-                  </div>
-                  <StudioInput
-                    id="address"
-                    placeholder="Enter or select project address..."
-                    className="h-10 bg-muted/30 border-border/40 focus:bg-background transition-all"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange("address", e.target.value)}
-                  />
-                </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <SearchSelect
+                label="Business Type"
+                placeholder={loadingBT ? "Loading..." : "Select type"}
+                options={businessTypeOptions}
+                value={formData.businessTypeId}
+                onValueChange={(val) => handleInputChange("businessTypeId", val)}
+                className="h-10 max-w-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <SearchSelect
+                label="Initial Stage"
+                placeholder={loadingST ? "Loading..." : "Select stage"}
+                options={stageTypeOptions}
+                value={formData.stageTypeId}
+                onValueChange={(val) => handleInputChange("stageTypeId", val)}
+                className="h-10 max-w-none"
+              />
+            </div>
+          </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <SearchSelect
-                      label="Business Type"
-                      placeholder={loadingBT ? "Loading..." : "Select type"}
-                      options={businessTypeOptions}
-                      value={formData.businessTypeId}
-                      onValueChange={(val) => handleInputChange("businessTypeId", val)}
-                      className="h-10 max-w-none"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <SearchSelect
-                      label="Initial Stage"
-                      placeholder={loadingST ? "Loading..." : "Select stage"}
-                      options={stageTypeOptions}
-                      value={formData.stageTypeId}
-                      onValueChange={(val) => handleInputChange("stageTypeId", val)}
-                      className="h-10 max-w-none"
-                    />
-                  </div>
-                </div>
+          <div className="space-y-2">
+            <SearchSelect
+              label="Channel Partner"
+              placeholder={loadingCP ? "Loading..." : "Select partner"}
+              options={channelPartnerOptions}
+              value={formData.channelPartnerId}
+              onValueChange={(val) => handleInputChange("channelPartnerId", val)}
+              className="h-10 max-w-none"
+            />
+          </div>
 
-                <div className="space-y-2">
-                  <SearchSelect
-                    label="Channel Partner"
-                    placeholder={loadingCP ? "Loading..." : "Select partner"}
-                    options={channelPartnerOptions}
-                    value={formData.channelPartnerId}
-                    onValueChange={(val) => handleInputChange("channelPartnerId", val)}
-                    className="h-10 max-w-none"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="description" className="text-sm font-bold">Description</Label>
-                  <Textarea 
-                    id="description" 
-                    placeholder="Add project details or notes..." 
-                    className="min-h-[80px] bg-muted/30 border-border/40 focus:bg-background transition-all resize-none"
-                    value={formData.description}
-                    onChange={(e) => handleInputChange("description", e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-3 pt-2">
-                <ButtonShineHover 
-                  variant="outline" 
-                  onClick={onClose} 
-                  className="h-10 px-6 border-border/50 hover:bg-muted"
-                >
-                  Cancel
-                </ButtonShineHover>
-                <ButtonShineHover 
-                  className="h-10 px-8 bg-primary shadow-lg shadow-primary/20"
-                >
-                  Submit
-                </ButtonShineHover>
-              </div>
-            </motion.div>
-          </DialogContent>
-        )}
-      </AnimatePresence>
-    </Dialog>
+          <TextArea
+            id="description"
+            label="Notes / Description"
+            placeholder="Add project details or notes..."
+            className="min-h-[80px] bg-muted/30 border-border/40 focus:bg-background transition-all resize-none"
+            value={formData.description}
+            onChange={(e) => handleInputChange("description", e.target.value)}
+          />
+        </div>
+      </BaseModal>
     <MapModal 
       isOpen={isMapOpen} 
       onClose={() => setIsMapOpen(false)} 

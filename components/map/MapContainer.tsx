@@ -1,7 +1,11 @@
 "use client"
 import React, { useCallback, useRef, useState, useEffect } from "react"
 import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api"
-import { MAP_CENTER_MUMBAI, DEFAULT_ZOOM, MAP_STYLES } from "./constants/map.constants"
+import {
+  MAP_CENTER_MUMBAI,
+  DEFAULT_ZOOM,
+  MAP_STYLES,
+} from "./constants/map.constants"
 import { useMapStore } from "./hooks/useMapStore"
 import { isLocationInMumbai, generateGoogleMapsLink } from "./utils/map"
 import { SearchBox } from "./SearchBox"
@@ -15,9 +19,19 @@ const containerStyle = {
   height: "100%",
 }
 
-const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = ["places"]
+const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = [
+  "places",
+]
 
-export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address: string) => void }) => {
+export const MapContainer = ({
+  onLocationSelect,
+  hideSearch = false,
+  hideCard = false,
+}: {
+  onLocationSelect: (address: string) => void
+  hideSearch?: boolean
+  hideCard?: boolean
+}) => {
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
@@ -26,13 +40,16 @@ export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address:
 
   if (loadError) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center bg-background p-6 text-center">
-        <div className="bg-destructive/10 p-4 rounded-full mb-4">
+      <div className="flex h-full w-full flex-col items-center justify-center bg-background p-6 text-center">
+        <div className="mb-4 rounded-full bg-destructive/10 p-4">
           <Loader2 className="h-8 w-8 text-destructive" />
         </div>
-        <h3 className="text-lg font-bold text-foreground mb-2">Map Load Error</h3>
-        <p className="text-sm text-muted-foreground max-w-xs">
-          {loadError.message || "Failed to load Google Maps. Please check your API key and connection."}
+        <h3 className="mb-2 text-lg font-bold text-foreground">
+          Map Load Error
+        </h3>
+        <p className="max-w-xs text-sm text-muted-foreground">
+          {loadError.message ||
+            "Failed to load Google Maps. Please check your API key and connection."}
         </p>
       </div>
     )
@@ -57,6 +74,17 @@ export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address:
       setGeocoder(new window.google.maps.Geocoder())
     }
   }, [isLoaded, setGoogleMapsLoaded])
+
+  // Pan to selected location when it changes (e.g. from search)
+  useEffect(() => {
+    if (mapRef.current && selectedLocation && !isOutsideMumbai) {
+      mapRef.current.panTo({
+        lat: selectedLocation.lat,
+        lng: selectedLocation.lng,
+      })
+      mapRef.current.setZoom(15)
+    }
+  }, [selectedLocation, isOutsideMumbai])
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map
@@ -86,7 +114,11 @@ export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address:
               lng,
               address: results[0].formatted_address,
               placeId: results[0].place_id,
-              googleMapsLink: generateGoogleMapsLink(lat, lng, results[0].place_id),
+              googleMapsLink: generateGoogleMapsLink(
+                lat,
+                lng,
+                results[0].place_id
+              ),
             })
           }
         })
@@ -123,7 +155,11 @@ export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address:
                 lng,
                 address: results[0].formatted_address,
                 placeId: results[0].place_id,
-                googleMapsLink: generateGoogleMapsLink(lat, lng, results[0].place_id),
+                googleMapsLink: generateGoogleMapsLink(
+                  lat,
+                  lng,
+                  results[0].place_id
+                ),
               })
             }
           })
@@ -147,18 +183,20 @@ export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address:
 
   if (!isLoaded) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-background">
+      <div className="flex h-full w-full items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-sm text-muted-foreground font-medium">Loading Map Experience...</p>
+          <p className="text-sm font-medium text-muted-foreground">
+            Loading Map Experience...
+          </p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="relative w-full h-full bg-background overflow-hidden">
-      <SearchBox mapRef={mapRef} />
+    <div className="relative h-full w-full overflow-hidden bg-background">
+      {!hideSearch && <SearchBox mapRef={mapRef} />}
 
       <GoogleMap
         mapContainerStyle={containerStyle}
@@ -185,7 +223,7 @@ export const MapContainer = ({ onLocationSelect }: { onLocationSelect: (address:
 
       <CurrentLocationButton onClick={handleCurrentLocation} />
       <RestrictionOverlay isVisible={isOutsideMumbai} />
-      <AddressCard onConfirm={handleConfirm} />
+      {!hideCard && <AddressCard onConfirm={handleConfirm} />}
     </div>
   )
 }
