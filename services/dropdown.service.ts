@@ -14,14 +14,10 @@ export const dropdownService = {
 
   getStageTypes: async (): Promise<GetStageTypesResponse> => {
     const response = await apiClient.get("/api/v1/stage-types/stage-types")
-
     return response.data
   },
 
-
-  
-  
- getChannelPartners: async (
+  getChannelPartners: async (
     vendor_id: number
   ): Promise<GetChannelPartnersResponse> => {
     const response = await apiClient.get(

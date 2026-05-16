@@ -21,11 +21,11 @@ export const TextArea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
         <Textarea 
           ref={ref}
           id={id} 
-          className={cn(className)}
+          className={cn(error && "border-destructive focus-visible:ring-destructive", className)}
           aria-invalid={!!error}
           {...props} 
         />
-        {error && <p className="text-destructive text-xs">{error}</p>}
+        {error && <p className="text-destructive text-xs font-medium">{error}</p>}
       </div>
     )
   }

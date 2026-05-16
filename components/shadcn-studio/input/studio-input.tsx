@@ -13,11 +13,12 @@ export interface StudioInputProps extends React.InputHTMLAttributes<HTMLInputEle
   label?: string
   onClear?: () => void
   containerClassName?: string
+  error?: string
 }
 
 export const StudioInput = React.forwardRef<HTMLInputElement, StudioInputProps>(
   (
-    { label, value, onChange, onClear, containerClassName, id: externalId, className, ...props },
+    { label, value, onChange, onClear, containerClassName, error, id: externalId, className, ...props },
     ref
   ) => {
     const internalRef = useRef<HTMLInputElement>(null)
@@ -55,7 +56,8 @@ export const StudioInput = React.forwardRef<HTMLInputElement, StudioInputProps>(
             id={id}
             value={value}
             onChange={onChange}
-            className={cn("pe-9", className)}
+            className={cn("pe-9", error && "border-destructive focus-visible:ring-destructive", className)}
+            aria-invalid={!!error}
             {...props}
           />
           {value && (
@@ -71,6 +73,7 @@ export const StudioInput = React.forwardRef<HTMLInputElement, StudioInputProps>(
             </Button>
           )}
         </div>
+        {error && <p className="text-xs font-medium text-destructive">{error}</p>}
       </div>
     )
   }

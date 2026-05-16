@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card"
 
 import ButtonShineHover from "@/components/shadcn-studio/button/button-41"
-import { CreateProjectModal } from "@/components/production/createProjectModal"
+import { CreateProjectModal } from "@/components/production/create-project-modal"
 import { Button } from "@/components/ui/button"
 
 export default function SignageCreatedPage() {

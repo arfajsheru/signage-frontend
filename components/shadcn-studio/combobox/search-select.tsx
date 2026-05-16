@@ -30,6 +30,7 @@ interface SearchSelectProps {
   emptyMessage?: string
   className?: string
   containerClassName?: string
+  error?: string
 }
 
 const SearchSelect = ({
@@ -42,6 +43,7 @@ const SearchSelect = ({
   emptyMessage = "No results found.",
   className,
   containerClassName,
+  error,
 }: SearchSelectProps) => {
   const id = useId()
   const [open, setOpen] = useState(false)
@@ -61,8 +63,8 @@ const SearchSelect = ({
   const selectedOption = options.find((option) => option.value === activeValue)
 
   return (
-    <div className={cn("w-full max-w-xs space-y-2", containerClassName)}>
-      {label && <Label htmlFor={id}>{label}</Label>}
+    <div className={cn("w-full space-y-2", containerClassName)}>
+      {label && <Label htmlFor={id} className="text-sm font-bold">{label}</Label>}
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -70,14 +72,18 @@ const SearchSelect = ({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className={cn("h-8 w-full justify-between px-2.5 font-normal", className)}
+            className={cn(
+              "h-9 w-full justify-between px-3 font-normal bg-muted/30 hover:bg-muted/50",
+              error && "border-destructive focus-visible:ring-destructive",
+              className
+            )}
           >
             {selectedOption ? (
               selectedOption.label
             ) : (
               <span className="text-muted-foreground">{placeholder}</span>
             )}
-            <ChevronsUpDownIcon className="opacity-50" />
+            <ChevronsUpDownIcon className="opacity-50 h-4 w-4" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0">
@@ -112,6 +118,7 @@ const SearchSelect = ({
           </Command>
         </PopoverContent>
       </Popover>
+      {error && <p className="text-xs font-medium text-destructive">{error}</p>}
     </div>
   )
 }

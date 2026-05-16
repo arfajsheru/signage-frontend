@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { CreateProjectModal } from "@/components/production/createProjectModal"
+import { CreateProjectModal } from "@/components/production/create-project-modal"
 import { Button } from "@/components/ui/button"
 import { BaseModal } from "@/components/comman/BaseModal"
 

@@ -1,15 +1,38 @@
 "use client"
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Plus, Hammer, Printer, Sparkles } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
+import { BaseModal } from "@/components/comman/BaseModal"
+import { useGetBusinessTypes, useGetChannelPartners } from "@/hooks/use-dropdown"
+import SearchSelect from "@/components/shadcn-studio/combobox/search-select"
+import { StudioInput } from "@/components/shadcn-studio/input/studio-input"
+import { TextArea } from "@/components/shadcn-studio/textarea/TextArea"
+import { useState, useEffect } from "react"
+import { User } from "@/types/auth"
+import { MapModal } from "@/components/map/MapModal"
+import { MapPin } from "lucide-react"
+import { Label } from "@/components/ui/label"
+import { PhoneInput } from "@/components/shadcn-studio/input/phone-input"
+import { DateInput } from "@/components/shadcn-studio/date-picker/date-input"
+import { useCreateProject } from "@/hooks/use-project"
+import { z } from "zod"
+
+const projectSchema = z.object({
+  name: z.string().min(1, "Project Name is required"),
+  client_name: z.string().optional(),
+  client_email: z.string().email("Invalid email format").optional().or(z.literal("")),
+  client_phone: z.string().optional(),
+  site_address: z.string().optional(),
+  site_map_link: z.string().optional(),
+  business_type_id: z.string().min(1, "Business Type is required"),
+  channel_partner_id: z.string().optional(),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
+  total_amount: z.string().optional(),
+  advance_paid: z.string().optional(),
+  notes: z.string().optional(),
+  deadline: z.date({
+    required_error: "Project Deadline is required",
+    invalid_type_error: "Project Deadline is required",
+  })
+})
 
 interface CreateProjectModalProps {
   isOpen: boolean
@@ -18,55 +41,303 @@ interface CreateProjectModalProps {
 }
 
 export function CreateProjectModal({ isOpen, onClose, type }: CreateProjectModalProps) {
+  const [user, setUser] = useState<User | null>(null)
+  
+  // Form State
+  const [formData, setFormData] = useState({
+    name: "",
+    client_name: "",
+    client_email: "",
+    client_phone: "",
+    site_address: "",
+    site_map_link: "",
+    business_type_id: "",
+    channel_partner_id: "",
+    priority: "MEDIUM" as "LOW" | "MEDIUM" | "HIGH",
+    total_amount: "",
+    advance_paid: "",
+    notes: "",
+    deadline: undefined as Date | undefined,
+  })
+
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const [isMapOpen, setIsMapOpen] = useState(false)
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user")
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    }
+  }, [isOpen])
+
+  // Fetch Dropdown Data
+  const { data: businessTypes, isLoading: loadingBT } = useGetBusinessTypes()
+  const { data: channelPartners, isLoading: loadingCP } = useGetChannelPartners(
+    user?.vendor_id ? Number(user.vendor_id) : 0
+  )
+
+  // Mutations
+  const { mutate: createProject, isPending } = useCreateProject()
+
+  // Map data to options
+  const businessTypeOptions = businessTypes?.data?.map(bt => ({
+    value: String(bt.id),
+    label: bt.name
+  })) || []
+
+  const channelPartnerOptions = channelPartners?.data?.map(cp => ({
+    value: String(cp.id),
+    label: cp.name
+  })) || []
+
+  const priorityOptions = [
+    { value: "LOW", label: "Low" },
+    { value: "MEDIUM", label: "Medium" },
+    { value: "HIGH", label: "High" },
+    { value: "URGENT", label: "Urgent" },
+ 
+  ]
+
+  const handleInputChange = (field: string, value: string | Date | undefined) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
+
+  const handleSubmit = () => {
+    console.log("--- Form Submission Started ---")
+    console.log("Current Form Data:", formData)
+    
+    const result = projectSchema.safeParse(formData)
+    
+    if (!result.success) {
+      const formattedErrors: Record<string, string> = {}
+      result.error.issues.forEach(issue => {
+        formattedErrors[issue.path[0]] = issue.message
+      })
+      setErrors(formattedErrors)
+      console.error("Validation failed:", formattedErrors)
+      return
+    }
+
+    setErrors({})
+
+    const payload = {
+      name: result.data.name,
+      client_name: result.data.client_name || "",
+      business_type_id: Number(result.data.business_type_id),
+      client_phone: result.data.client_phone || "",
+      client_email: result.data.client_email || "",
+      site_address: result.data.site_address || "",
+      site_map_link: result.data.site_map_link || "",
+      notes: result.data.notes || "",
+      priority: result.data.priority,
+      channel_partner_id: result.data.channel_partner_id ? Number(result.data.channel_partner_id) : 0,
+      total_amount: Number(result.data.total_amount) || 0,
+      advance_paid: Number(result.data.advance_paid) || 0,
+      deadline: result.data.deadline.toISOString()
+    }
+
+    console.log("Creating project with payload:", payload)
+    
+    createProject(payload, {
+      onSuccess: () => {
+        alert("Project created successfully!")
+        setFormData({
+          name: "",
+          client_name: "",
+          client_email: "",
+          client_phone: "",
+          site_address: "",
+          site_map_link: "",
+          business_type_id: "",
+          channel_partner_id: "",
+          priority: "MEDIUM",
+          total_amount: "",
+          advance_paid: "",
+          notes: "",
+          deadline: undefined,
+        })
+        setErrors({})
+        onClose()
+      },
+      onError: (err) => {
+        alert("Failed to create project. Please try again.")
+        console.error(err)
+      }
+    })
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none bg-transparent shadow-2xl">
-        <div className="relative w-full bg-background/80 backdrop-blur-xl border border-white/20 rounded-2xl overflow-hidden">
-          {/* Header Background Gradient */}
-          <div className={`absolute top-0 inset-x-0 h-32 bg-gradient-to-br ${
-            type === "signage" ? "from-orange-500/20 to-blue-600/20" : "from-indigo-500/20 to-purple-600/20"
-          } blur-3xl opacity-50`} />
+    <>
+      <BaseModal
+        isOpen={isOpen}
+        onClose={onClose}
+        title={`Create New ${type === 'signage' ? 'Signage' : 'Print'} Job`}
+        description={`Fill in the details below to initialize a new production project for the ${type} module.`}
+        size="xl"
+        primaryButtonText={isPending ? "Creating..." : "Submit"}
+        secondaryButtonText="Cancel"
+        onPrimaryAction={handleSubmit}
+      >
+        <div className="space-y-6 py-2">
           
-          <DialogHeader className="relative p-8 pb-4">
-            <div className="flex items-center gap-4">
-              <div className={`h-12 w-12 rounded-xl flex items-center justify-center shadow-lg ${
-                type === "signage" ? "bg-orange-500 text-white" : "bg-indigo-600 text-white"
-              }`}>
-                {type === "signage" ? <Hammer className="h-6 w-6" /> : <Printer className="h-6 w-6" />}
-              </div>
-              <div>
-                <DialogTitle className="text-2xl font-black tracking-tight uppercase">
-                  New <span className="text-primary">{type}</span> Project
-                </DialogTitle>
-                <DialogDescription className="text-sm font-medium opacity-70">
-                  Configure your production requirements below.
-                </DialogDescription>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Row 1: Project Name & Client Name */}
+            <div className="space-y-2">
+              <StudioInput
+                id="project-name"
+                label="Project Name *"
+                placeholder="Enter project name..."
+                value={formData.name}
+                onChange={(e) => handleInputChange("name", e.target.value)}
+                error={errors.name}
+              />
             </div>
-          </DialogHeader>
-
-          <div className="px-8 py-12 relative flex flex-col items-center justify-center text-center">
-            <div className="h-20 w-20 rounded-full bg-muted/50 flex items-center justify-center mb-6 border border-dashed border-muted-foreground/30">
-              <Sparkles className="h-8 w-8 text-muted-foreground animate-pulse" />
+            <div className="space-y-2">
+              <StudioInput
+                id="client-name"
+                label="Client Name"
+                placeholder="Enter client name..."
+                value={formData.client_name}
+                onChange={(e) => handleInputChange("client_name", e.target.value)}
+                error={errors.client_name}
+              />
             </div>
-            <h3 className="text-lg font-bold mb-2">Form Structure Coming Soon</h3>
-            <p className="text-muted-foreground text-sm max-w-[280px]">
-              We are finalizing the production fields for the <span className="font-bold text-foreground capitalize">{type}</span> module.
-            </p>
-          </div>
 
-          <div className="p-6 bg-muted/30 border-t border-white/10 flex justify-end gap-3">
-            <Button variant="ghost" onClick={onClose} className="font-semibold">
-              Cancel
-            </Button>
-            <Button className={`font-bold px-8 ${
-              type === "signage" ? "bg-orange-500 hover:bg-orange-600 shadow-orange-500/20" : "bg-indigo-600 hover:bg-indigo-500 shadow-indigo-500/20"
-            } shadow-lg`}>
-              Initialize Project
-            </Button>
+            {/* Row 2: Client Phone & Client Email */}
+            <div className="space-y-2">
+              <Label htmlFor="client-phone" className="text-sm font-bold">Client Phone</Label>
+              <PhoneInput
+                id="client-phone"
+                placeholder="Enter client phone..."
+                value={formData.client_phone as any}
+                onChange={(val) => handleInputChange("client_phone", val || "")}
+                disableCountry
+                className={errors.client_phone ? "[&>input]:border-destructive" : ""}
+              />
+              {errors.client_phone && <p className="text-xs font-medium text-destructive">{errors.client_phone}</p>}
+            </div>
+            <div className="space-y-2">
+              <StudioInput
+                id="client-email"
+                type="email"
+                label="Client Email"
+                placeholder="Enter client email..."
+                value={formData.client_email}
+                onChange={(e) => handleInputChange("client_email", e.target.value)}
+                error={errors.client_email}
+              />
+            </div>
+
+            {/* Full Width Site Address */}
+            <div className="md:col-span-2 space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <Label htmlFor="site_address" className="text-sm font-bold">Site Address</Label>
+                <button
+                  type="button"
+                  onClick={() => setIsMapOpen(true)}
+                  className="text-xs font-semibold text-primary hover:text-primary/80 flex items-center gap-1 bg-primary/10 px-2 py-1 rounded-md transition-colors"
+                >
+                  <MapPin className="h-3 w-3" />
+                  Open Map
+                </button>
+              </div>
+              <TextArea
+                id="site_address"
+                placeholder="Enter or select site address..."
+                className="min-h-[40px] resize-none"
+                value={formData.site_address}
+                onChange={(e) => handleInputChange("site_address", e.target.value)}
+                error={errors.site_address}
+              />
+            </div>
+
+            {/* Row 4: Business Type & Channel Partner */}
+            <div className="space-y-2">
+              <SearchSelect
+                label="Business Type *"
+                placeholder={loadingBT ? "Loading..." : "Select business type"}
+                options={businessTypeOptions}
+                value={formData.business_type_id}
+                onValueChange={(val) => handleInputChange("business_type_id", val)}
+                error={errors.business_type_id}
+              />
+            </div>
+            <div className="space-y-2">
+              <SearchSelect
+                label="Channel Partner"
+                placeholder={loadingCP ? "Loading..." : "Select channel partner"}
+                options={channelPartnerOptions}
+                value={formData.channel_partner_id}
+                onValueChange={(val) => handleInputChange("channel_partner_id", val)}
+                error={errors.channel_partner_id}
+              />
+            </div>
+
+            {/* Row 5: Priority & Project Deadline */}
+            <div className="space-y-2">
+              <SearchSelect
+                label="Priority"
+                placeholder="Select priority"
+                options={priorityOptions}
+                value={formData.priority}
+                onValueChange={(val) => handleInputChange("priority", val as any)}
+                error={errors.priority}
+              />
+            </div>
+            <div className="space-y-2">
+              <DateInput
+                label="Project Deadline *"
+                value={formData.deadline}
+                onChange={(date) => handleInputChange("deadline", date)}
+                placeholder="Select project deadline"
+                error={errors.deadline}
+              />
+            </div>
+
+            {/* Row 6: Total Amount & Advance Paid */}
+            <div className="space-y-2">
+              <StudioInput
+                id="total-amount"
+                type="number"
+                label="Total Amount"
+                placeholder="Enter total amount..."
+                value={formData.total_amount}
+                onChange={(e) => handleInputChange("total_amount", e.target.value)}
+                error={errors.total_amount}
+              />
+            </div>
+            <div className="space-y-2">
+              <StudioInput
+                id="advance-paid"
+                type="number"
+                label="Advance Paid"
+                placeholder="Enter advance paid..."
+                value={formData.advance_paid}
+                onChange={(e) => handleInputChange("advance_paid", e.target.value)}
+                error={errors.advance_paid}
+              />
+            </div>
+
+            {/* Full Width Notes */}
+            <div className="md:col-span-2">
+              <TextArea
+                id="notes"
+                label="Notes / Description"
+                placeholder="Add project details or notes..."
+                className="min-h-[80px] resize-none"
+                value={formData.notes}
+                onChange={(e) => handleInputChange("notes", e.target.value)}
+                error={errors.notes}
+              />
+            </div>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </BaseModal>
+      <MapModal 
+        isOpen={isMapOpen} 
+        onClose={() => setIsMapOpen(false)} 
+        onLocationSelect={(addr) => handleInputChange("site_address", addr)} 
+      />
+    </>
   )
 }
