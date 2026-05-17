@@ -197,16 +197,16 @@ export function DataTable<T>({
 
       {/* Pagination */}
       {pagination && (
-        <div className="flex items-center justify-between gap-4 border-t border-border/60 bg-muted/20 px-4 py-3">
+        <div className="flex items-center justify-between gap-4 border-t border-border/60 bg-muted/30 px-4 py-3.5 select-none">
           {/* Left: rows per page + info */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground whitespace-nowrap">Rows per page</span>
               <Select
                 value={String(pagination.limit)}
                 onValueChange={(v) => onLimitChange?.(Number(v))}
               >
-                <SelectTrigger className="h-7 w-[66px] text-xs border-border/60 bg-background">
+                <SelectTrigger className="h-8 w-[68px] text-xs border-border bg-background shadow-sm hover:bg-muted/50 transition-colors">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -230,46 +230,52 @@ export function DataTable<T>({
           </div>
 
           {/* Right: page navigation */}
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs text-muted-foreground">
-              Page <span className="font-semibold text-foreground">{pagination.page}</span> / {pagination.totalPages}
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-muted-foreground hidden xs:inline">
+              Page <span className="font-semibold text-foreground">{pagination.page}</span> of {pagination.totalPages}
             </span>
-            <div className="flex items-center gap-0.5">
+            <div className="flex items-center gap-1">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8 rounded-lg border border-border bg-background text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-all duration-150 shadow-sm disabled:opacity-40 disabled:hover:bg-background disabled:hover:text-muted-foreground disabled:hover:border-border"
                 disabled={pagination.page <= 1}
                 onClick={() => onPageChange?.(1)}
               >
-                <ChevronsLeft className="h-3.5 w-3.5" />
+                <ChevronsLeft className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8 rounded-lg border border-border bg-background text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-all duration-150 shadow-sm disabled:opacity-40 disabled:hover:bg-background disabled:hover:text-muted-foreground disabled:hover:border-border mr-1"
                 disabled={pagination.page <= 1}
                 onClick={() => onPageChange?.(pagination.page - 1)}
               >
-                <ChevronLeft className="h-3.5 w-3.5" />
+                <ChevronLeft className="h-4 w-4" />
               </Button>
+
+              {/* Central Active Page Square Badge */}
+              <div className="h-8 min-w-[32px] px-2.5 rounded-lg border border-primary bg-primary text-primary-foreground font-bold text-xs flex items-center justify-center shadow-md shadow-primary/25 select-none mr-1">
+                {pagination.page}
+              </div>
+
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8 rounded-lg border border-border bg-background text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-all duration-150 shadow-sm disabled:opacity-40 disabled:hover:bg-background disabled:hover:text-muted-foreground disabled:hover:border-border"
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => onPageChange?.(pagination.page + 1)}
               >
-                <ChevronRight className="h-3.5 w-3.5" />
+                <ChevronRight className="h-4 w-4" />
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
-                className="h-7 w-7"
+                className="h-8 w-8 rounded-lg border border-border bg-background text-muted-foreground hover:bg-primary/5 hover:text-primary hover:border-primary/30 transition-all duration-150 shadow-sm disabled:opacity-40 disabled:hover:bg-background disabled:hover:text-muted-foreground disabled:hover:border-border"
                 disabled={pagination.page >= pagination.totalPages}
                 onClick={() => onPageChange?.(pagination.totalPages)}
               >
-                <ChevronsRight className="h-3.5 w-3.5" />
+                <ChevronsRight className="h-4 w-4" />
               </Button>
             </div>
           </div>
