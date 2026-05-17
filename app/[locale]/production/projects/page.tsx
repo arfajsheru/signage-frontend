@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import { Plus, Search, Trash2, Eye, Pencil, X, RefreshCw, MapPin, Calendar, Clock, Hash, User, Phone, Mail, Sparkles } from "lucide-react"
+import { Plus, Search, Trash2, Eye, Pencil, X, RefreshCw, MapPin, Calendar, Clock, Hash, User, Phone, Mail, Sparkles, ArrowLeft, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
 
 import ButtonShineHover from "@/components/shadcn-studio/button/button-41"
@@ -9,29 +9,9 @@ import { CreateProjectModal } from "@/components/production/create-project-modal
 import { DataTable, ColumnDef } from "@/components/ui/data-table"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetDescription,
-} from "@/components/ui/sheet"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { useGetProjects, useDeleteProject } from "@/hooks/use-project"
 import { Project, GetProjectsParams } from "@/types/project.types"
 import { cn } from "@/lib/utils"
@@ -57,10 +37,7 @@ const PRIORITY_MAP: Record<string, { label: string; className: string }> = {
 function StatusBadge({ status }: { status: string }) {
   const cfg = STATUS_MAP[status] ?? { label: status, className: "" }
   return (
-    <span className={cn(
-      "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap",
-      cfg.className
-    )}>
+    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap", cfg.className)}>
       {cfg.label}
     </span>
   )
@@ -69,10 +46,7 @@ function StatusBadge({ status }: { status: string }) {
 function PriorityBadge({ priority }: { priority: string }) {
   const cfg = PRIORITY_MAP[priority] ?? { label: priority, className: "" }
   return (
-    <span className={cn(
-      "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap",
-      cfg.className
-    )}>
+    <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold whitespace-nowrap", cfg.className)}>
       {cfg.label}
     </span>
   )
@@ -80,8 +54,7 @@ function PriorityBadge({ priority }: { priority: string }) {
 
 function formatDate(dateStr: string) {
   if (!dateStr) return "—"
-  const d = new Date(dateStr)
-  return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
+  return new Date(dateStr).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })
 }
 
 function formatAmount(amount: number) {
@@ -96,9 +69,7 @@ const columns: ColumnDef<Project>[] = [
     header: "Code",
     sortable: true,
     accessorFn: (row) => (
-      <span className="font-mono text-[12px] font-semibold text-primary tracking-wide">
-        {row.project_code}
-      </span>
+      <span className="font-mono text-[12px] font-semibold text-primary tracking-wide">{row.project_code}</span>
     ),
   },
   {
@@ -128,9 +99,7 @@ const columns: ColumnDef<Project>[] = [
     key: "site_map_link",
     header: "Map",
     accessorFn: (row) => {
-      if (!row.site_map_link) {
-        return <span className="text-muted-foreground text-xs">—</span>
-      }
+      if (!row.site_map_link) return <span className="text-muted-foreground text-xs">—</span>
       return (
         <a
           href={row.site_map_link}
@@ -138,10 +107,7 @@ const columns: ColumnDef<Project>[] = [
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-primary bg-primary/10 rounded-md border border-primary/20 hover:bg-primary hover:text-primary-foreground transition-all duration-150 shadow-sm"
         >
-          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
+          <MapPin className="h-3 w-3" />
           Open Map
         </a>
       )
@@ -189,84 +155,52 @@ const columns: ColumnDef<Project>[] = [
     key: "created_at",
     header: "Created",
     sortable: true,
-    accessorFn: (row) => (
-      <span className="text-xs text-muted-foreground">{formatDate(row.created_at)}</span>
-    ),
+    accessorFn: (row) => <span className="text-xs text-muted-foreground">{formatDate(row.created_at)}</span>,
   },
 ]
 
 // ── Filter Bar ────────────────────────────────────────────────────────────────
 
 interface FilterBarProps {
-  search: string
-  onSearchChange: (v: string) => void
-  status: string
-  onStatusChange: (v: string) => void
-  priority: string
-  onPriorityChange: (v: string) => void
-  source: string
-  onSourceChange: (v: string) => void
-  onReset: () => void
-  activeFilterCount: number
+  search: string; onSearchChange: (v: string) => void
+  status: string; onStatusChange: (v: string) => void
+  priority: string; onPriorityChange: (v: string) => void
+  source: string; onSourceChange: (v: string) => void
+  onReset: () => void; activeFilterCount: number
 }
 
-function FilterBar({
-  search, onSearchChange,
-  status, onStatusChange,
-  priority, onPriorityChange,
-  source, onSourceChange,
-  onReset, activeFilterCount,
-}: FilterBarProps) {
+function FilterBar({ search, onSearchChange, status, onStatusChange, priority, onPriorityChange, source, onSourceChange, onReset, activeFilterCount }: FilterBarProps) {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
-      {/* Search */}
       <div className="relative flex-1 min-w-[220px] max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground pointer-events-none" />
-        <Input
-          placeholder="Search projects, clients..."
-          value={search}
-          onChange={(e) => onSearchChange(e.target.value)}
-          className="pl-8 h-9 text-sm border-border/60 bg-background"
-        />
+        <Input placeholder="Search projects, clients..." value={search} onChange={(e) => onSearchChange(e.target.value)} className="pl-8 h-9 text-sm border-border/60 bg-background" />
         {search && (
-          <button
-            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-            onClick={() => onSearchChange("")}
-          >
+          <button className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" onClick={() => onSearchChange("")}>
             <X className="h-3.5 w-3.5" />
           </button>
         )}
       </div>
-
-      {/* Status filter */}
       <Select value={status} onValueChange={onStatusChange}>
-        <SelectTrigger className={cn("h-9 w-[145px] text-sm border-border/60 bg-background", status && "border-primary/50 text-primary")}>
+        <SelectTrigger className={cn("h-9 w-[145px] text-sm border-border/60 bg-background", status && status !== "all" && "border-primary/50 text-primary")}>
           <SelectValue placeholder="All Statuses" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Statuses</SelectItem>
-          {Object.entries(STATUS_MAP).map(([k, v]) => (
-            <SelectItem key={k} value={k}>{v.label}</SelectItem>
-          ))}
+          {Object.entries(STATUS_MAP).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
         </SelectContent>
       </Select>
-
-      {/* Priority filter */}
       <Select value={priority} onValueChange={onPriorityChange}>
-        <SelectTrigger className={cn("h-9 w-[145px] text-sm border-border/60 bg-background", priority && "border-primary/50 text-primary")}>
+        <SelectTrigger className={cn("h-9 w-[145px] text-sm border-border/60 bg-background", priority && priority !== "all" && "border-primary/50 text-primary")}>
           <SelectValue placeholder="All Priorities" />
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">All Priorities</SelectItem>
-          {Object.entries(PRIORITY_MAP).map(([k, v]) => (
-            <SelectItem key={k} value={k}>{v.label}</SelectItem>
-          ))}
+          {Object.entries(PRIORITY_MAP).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
         </SelectContent>
       </Select>
-
-      {/* Source filter */}
       <Select value={source} onValueChange={onSourceChange}>
-        <SelectTrigger className={cn("h-9 w-[130px] text-sm border-border/60 bg-background", source && "border-primary/50 text-primary")}>
+        <SelectTrigger className={cn("h-9 w-[130px] text-sm border-border/60 bg-background", source && source !== "all" && "border-primary/50 text-primary")}>
           <SelectValue placeholder="All Sources" />
         </SelectTrigger>
         <SelectContent>
@@ -275,20 +209,11 @@ function FilterBar({
           <SelectItem value="CHANNEL_PARTNER">Channel Partner</SelectItem>
         </SelectContent>
       </Select>
-
-      {/* Reset */}
       {activeFilterCount > 0 && (
-        <Button
-          variant="ghost"
-          size="sm"
-          className="h-9 gap-1.5 text-muted-foreground hover:text-foreground border border-border/60"
-          onClick={onReset}
-        >
+        <Button variant="ghost" size="sm" className="h-9 gap-1.5 text-muted-foreground hover:text-foreground border border-border/60" onClick={onReset}>
           <RefreshCw className="h-3.5 w-3.5" />
           Reset
-          <Badge variant="secondary" className="ml-0.5 h-4 min-w-[16px] rounded-full px-1 text-[10px]">
-            {activeFilterCount}
-          </Badge>
+          <Badge variant="secondary" className="ml-0.5 h-4 min-w-[16px] rounded-full px-1 text-[10px]">{activeFilterCount}</Badge>
         </Button>
       )}
     </div>
@@ -297,43 +222,128 @@ function FilterBar({
 
 // ── Action Buttons ────────────────────────────────────────────────────────────
 
-interface ActionButtonsProps {
-  project: Project
-  onView: (project: Project) => void
-  onEdit: (project: Project) => void
-  onDelete: (project: Project) => void
-}
-
-function ActionButtons({ project, onView, onEdit, onDelete }: ActionButtonsProps) {
+function ActionButtons({ project, onView, onEdit, onDelete }: { project: Project; onView: (p: Project) => void; onEdit: (p: Project) => void; onDelete: (p: Project) => void }) {
   return (
     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 hover:bg-primary/10 hover:text-primary"
-        onClick={() => onView(project)}
-        title="View Project"
-      >
+      <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-primary/10 hover:text-primary" onClick={() => onView(project)} title="View Project">
         <Eye className="h-3.5 w-3.5" />
       </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 hover:bg-amber-500/10 hover:text-amber-600"
-        onClick={() => onEdit(project)}
-        title="Edit Project"
-      >
+      <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-amber-500/10 hover:text-amber-600" onClick={() => onEdit(project)} title="Edit Project">
         <Pencil className="h-3.5 w-3.5" />
       </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive"
-        onClick={() => onDelete(project)}
-        title="Delete Project"
-      >
+      <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-destructive/10 hover:text-destructive" onClick={() => onDelete(project)} title="Delete Project">
         <Trash2 className="h-3.5 w-3.5" />
       </Button>
+    </div>
+  )
+}
+
+// ── Project Detail Full Page ───────────────────────────────────────────────────
+
+function ProjectDetailView({ project, onBack }: { project: Project; onBack: () => void }) {
+  const statusCfg = STATUS_MAP[project.status] ?? { label: project.status, className: "" }
+  const priorityCfg = PRIORITY_MAP[project.priority] ?? { label: project.priority, className: "" }
+
+  const infoCards = [
+    { icon: User,     label: "Client",   value: project.client_name },
+    { icon: Phone,    label: "Phone",    value: project.client_phone || "—" },
+    { icon: Mail,     label: "Email",    value: project.client_email || "—" },
+    { icon: Calendar, label: "Deadline", value: formatDate(project.deadline) },
+    { icon: Hash,     label: "Amount",   value: formatAmount(project.total_amount) },
+    { icon: Clock,    label: "Advance",  value: formatAmount(project.advance_paid) },
+  ]
+
+  return (
+    <div className="animate-in slide-in-from-right-8 duration-300 ease-out space-y-0">
+      {/* Back Header */}
+      <div className="flex items-center gap-3 mb-5">
+        <button
+          onClick={onBack}
+          className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group"
+        >
+          <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+          <span>All Projects</span>
+        </button>
+        <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/40" />
+        <span className="text-sm font-medium text-foreground truncate max-w-[200px]">{project.name}</span>
+      </div>
+
+      {/* Project Hero Card */}
+      <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm mb-5">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-primary/3 to-transparent" />
+        <div className="absolute inset-0 opacity-[0.025]" style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "20px 20px" }} />
+        <div className="relative px-6 py-5">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-mono text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded px-2 py-0.5">
+                  {project.project_code}
+                </span>
+                <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", statusCfg.className)}>
+                  {statusCfg.label}
+                </span>
+                <span className={cn("inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold", priorityCfg.className)}>
+                  {priorityCfg.label}
+                </span>
+              </div>
+              <h1 className="text-xl font-bold text-foreground leading-tight">{project.name}</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">{project.client_name}</p>
+            </div>
+            <div className="shrink-0 text-right">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Total Amount</p>
+              <p className="text-xl font-bold text-foreground">{formatAmount(project.total_amount)}</p>
+              <p className="text-xs text-muted-foreground">Adv: {formatAmount(project.advance_paid)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Info Cards Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+        {infoCards.map(({ icon: Icon, label, value }) => (
+          <div key={label} className="rounded-xl border border-border/60 bg-card px-4 py-3.5 flex items-start gap-3">
+            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <Icon className="h-4 w-4 text-primary" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
+              <p className="text-sm font-semibold text-foreground truncate mt-0.5">{value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Site Map */}
+      {project.site_map_link && (
+        <div className="mb-5">
+          <a
+            href={project.site_map_link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-5 py-2.5 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-150 shadow-sm"
+          >
+            <MapPin className="h-4 w-4" />
+            Open Site Location on Map
+          </a>
+        </div>
+      )}
+
+      {/* Coming Soon Section */}
+      <div className="rounded-2xl border border-border/60 bg-card overflow-hidden">
+        <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
+          <div className="relative mb-5">
+            <div className="h-20 w-20 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shadow-xl shadow-primary/10">
+              <Sparkles className="h-9 w-9 text-primary/60" />
+            </div>
+            <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/30 animate-ping" />
+            <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/50" />
+          </div>
+          <p className="text-base font-bold text-foreground">Project Details — Coming Soon</p>
+          <p className="text-sm text-muted-foreground leading-relaxed mt-2 max-w-sm">
+            Full production tracking, stage timelines, documents, team assignments, and financials will be available here soon.
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
@@ -355,18 +365,16 @@ export default function AllProjectsPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
 
   const params: GetProjectsParams = {
-    page,
-    limit,
+    page, limit,
     ...(search && { search }),
     ...(statusFilter && statusFilter !== "all" && { status: statusFilter as GetProjectsParams["status"] }),
     ...(priorityFilter && priorityFilter !== "all" && { priority: priorityFilter as GetProjectsParams["priority"] }),
     ...(sourceFilter && sourceFilter !== "all" && { project_source: sourceFilter as GetProjectsParams["project_source"] }),
-    sortBy,
-    sortOrder,
+    sortBy, sortOrder,
   }
 
   const { data, isLoading } = useGetProjects(params)
-  const { mutate: deleteProject, isPending: isDeleting } = useDeleteProject()
+  const { mutate: deleteProject } = useDeleteProject()
 
   const projects = data?.data ?? []
   const meta = data?.meta
@@ -378,34 +386,16 @@ export default function AllProjectsPage() {
     sourceFilter && sourceFilter !== "all" ? sourceFilter : "",
   ].filter(Boolean).length
 
-  const handleReset = useCallback(() => {
-    setSearch("")
-    setStatusFilter("")
-    setPriorityFilter("")
-    setSourceFilter("")
-    setPage(1)
-  }, [])
+  const handleReset = useCallback(() => { setSearch(""); setStatusFilter(""); setPriorityFilter(""); setSourceFilter(""); setPage(1) }, [])
 
   const handleSort = useCallback((key: string, direction: "asc" | "desc" | null) => {
-    if (!direction) {
-      setSortBy("created_at")
-      setSortOrder("desc")
-    } else {
-      setSortBy(key)
-      setSortOrder(direction)
-    }
+    if (!direction) { setSortBy("created_at"); setSortOrder("desc") }
+    else { setSortBy(key); setSortOrder(direction) }
     setPage(1)
   }, [])
 
-  const handleView = useCallback((project: Project) => {
-    setSelectedProject(project)
-  }, [])
-
-  const handleEdit = useCallback((project: Project) => {
-    // TODO: open edit modal
-    toast.info(`Editing: ${project.name}`)
-  }, [])
-
+  const handleView = useCallback((project: Project) => { setSelectedProject(project) }, [])
+  const handleEdit = useCallback((project: Project) => { toast.info(`Editing: ${project.name}`) }, [])
   const handleDelete = useCallback((project: Project) => {
     if (!confirm(`Delete project "${project.name}"? This cannot be undone.`)) return
     deleteProject(project.id, {
@@ -414,120 +404,22 @@ export default function AllProjectsPage() {
     })
   }, [deleteProject])
 
-  const STATUS_CFG = STATUS_MAP[selectedProject?.status ?? ""] ?? { label: selectedProject?.status ?? "", className: "" }
+  // ── If a project is selected, show full-page detail view ──────────────────
+  if (selectedProject) {
+    return (
+      <ProjectDetailView
+        project={selectedProject}
+        onBack={() => setSelectedProject(null)}
+      />
+    )
+  }
 
+  // ── Otherwise show the list ───────────────────────────────────────────────
   return (
     <div className="space-y-5">
-      {/* Create modal */}
       {modalType && (
-        <CreateProjectModal
-          isOpen={!!modalType}
-          onClose={() => setModalType(null)}
-          type={modalType}
-        />
+        <CreateProjectModal isOpen={!!modalType} onClose={() => setModalType(null)} type={modalType} />
       )}
-
-      {/* Project Detail Slide Panel */}
-      <Sheet open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
-        <SheetContent
-          side="right"
-          className="w-full sm:max-w-lg p-0 gap-0 flex flex-col"
-          showCloseButton={false}
-        >
-          {selectedProject && (
-            <>
-              {/* Panel Header with gradient */}
-              <div className="relative overflow-hidden border-b border-border/60">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
-                {/* dot grid */}
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "18px 18px" }} />
-                <div className="relative px-6 pt-5 pb-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-mono text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5">
-                          {selectedProject.project_code}
-                        </span>
-                        <span className={cn(
-                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold",
-                          STATUS_CFG.className
-                        )}>
-                          {STATUS_CFG.label}
-                        </span>
-                      </div>
-                      <SheetTitle className="text-lg font-bold leading-tight text-foreground">
-                        {selectedProject.name}
-                      </SheetTitle>
-                      <SheetDescription className="text-sm text-muted-foreground mt-0.5">
-                        {selectedProject.client_name}
-                      </SheetDescription>
-                    </div>
-                    <button
-                      onClick={() => setSelectedProject(null)}
-                      className="shrink-0 h-8 w-8 rounded-lg border border-border bg-background/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Coming Soon Body */}
-              <div className="flex-1 flex flex-col items-center justify-center gap-5 px-6 py-12">
-                {/* Animated glow orb */}
-                <div className="relative">
-                  <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shadow-xl shadow-primary/10">
-                    <Sparkles className="h-10 w-10 text-primary/60" />
-                  </div>
-                  <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/30 animate-ping" />
-                  <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/50" />
-                </div>
-
-                <div className="text-center space-y-2 max-w-xs">
-                  <p className="text-base font-bold text-foreground">Coming Soon</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Project details page is under development. Full production tracking, stage timelines, documents, and financials will be available here.
-                  </p>
-                </div>
-
-                {/* Quick Info Cards */}
-                <div className="w-full grid grid-cols-2 gap-2.5 mt-2">
-                  {[
-                    { icon: User, label: "Client", value: selectedProject.client_name },
-                    { icon: Phone, label: "Phone", value: selectedProject.client_phone || "—" },
-                    { icon: Mail, label: "Email", value: selectedProject.client_email || "—" },
-                    { icon: Calendar, label: "Deadline", value: selectedProject.deadline ? new Date(selectedProject.deadline).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—" },
-                    { icon: Hash, label: "Amount", value: new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(selectedProject.total_amount) },
-                    { icon: Clock, label: "Created", value: new Date(selectedProject.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
-                  ].map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="rounded-xl border border-border/60 bg-muted/30 px-3.5 py-3 flex items-start gap-2.5">
-                      <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Icon className="h-3.5 w-3.5 text-primary" />
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
-                        <p className="text-xs font-semibold text-foreground truncate mt-0.5">{value}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {selectedProject.site_map_link && (
-                  <a
-                    href={selectedProject.site_map_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-150 shadow-sm"
-                  >
-                    <MapPin className="h-4 w-4" />
-                    Open Site Location
-                  </a>
-                )}
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
 
       {/* Page Header */}
       <div className="flex items-start justify-between gap-4">
@@ -535,9 +427,7 @@ export default function AllProjectsPage() {
           <h1 className="text-xl font-bold tracking-tight">All Projects</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Manage and track all production projects.
-            {meta && (
-              <span className="ml-1 font-medium text-foreground">{meta.total} total</span>
-            )}
+            {meta && <span className="ml-1 font-medium text-foreground">{meta.total} total</span>}
           </p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -566,14 +456,10 @@ export default function AllProjectsPage() {
 
       {/* Filters */}
       <FilterBar
-        search={search}
-        onSearchChange={(v) => { setSearch(v); setPage(1) }}
-        status={statusFilter}
-        onStatusChange={(v) => { setStatusFilter(v); setPage(1) }}
-        priority={priorityFilter}
-        onPriorityChange={(v) => { setPriorityFilter(v); setPage(1) }}
-        source={sourceFilter}
-        onSourceChange={(v) => { setSourceFilter(v); setPage(1) }}
+        search={search} onSearchChange={(v) => { setSearch(v); setPage(1) }}
+        status={statusFilter} onStatusChange={(v) => { setStatusFilter(v); setPage(1) }}
+        priority={priorityFilter} onPriorityChange={(v) => { setPriorityFilter(v); setPage(1) }}
+        source={sourceFilter} onSourceChange={(v) => { setSourceFilter(v); setPage(1) }}
         onReset={handleReset}
         activeFilterCount={activeFilterCount}
       />
@@ -589,25 +475,11 @@ export default function AllProjectsPage() {
         sortKey={sortBy}
         sortDirection={sortOrder}
         onSort={handleSort}
-        pagination={
-          meta
-            ? {
-                page: meta.page,
-                limit: meta.limit,
-                total: meta.total,
-                totalPages: meta.totalPages,
-              }
-            : undefined
-        }
+        pagination={meta ? { page: meta.page, limit: meta.limit, total: meta.total, totalPages: meta.totalPages } : undefined}
         onPageChange={setPage}
         onLimitChange={(v) => { setLimit(v); setPage(1) }}
         renderActions={(row) => (
-          <ActionButtons
-            project={row}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <ActionButtons project={row} onView={handleView} onEdit={handleEdit} onDelete={handleDelete} />
         )}
       />
     </div>
