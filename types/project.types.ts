@@ -15,6 +15,7 @@ export interface CreateProjectPayload {
   advance_paid: number
   deadline: string
   project_source: "DIRECT" | "CHANNEL_PARTNER"
+  project_category_id?: number
 }
 
 export interface Project {

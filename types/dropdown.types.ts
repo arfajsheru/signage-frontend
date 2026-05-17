@@ -51,3 +51,26 @@ export interface GetChannelPartnersResponse {
   message: string;
   data: ChannelPartner[];
 }
+
+
+
+export interface ProjectCategory {
+  id: number
+  business_type_id: number
+  category_name: string
+  is_active: boolean
+  created_at: string
+  updated_at: string
+
+  business_type: {
+    id: number
+    name: string
+    created_at: string
+  }
+}
+
+export interface GetProjectCategoriesResponse {
+  success: boolean
+  message: string
+  data: ProjectCategory[]
+}

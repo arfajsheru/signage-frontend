@@ -4,6 +4,7 @@ import { BaseModal } from "@/components/comman/BaseModal"
 import {
   useGetBusinessTypes,
   useGetChannelPartners,
+  useGetProjectCategories,
 } from "@/hooks/use-dropdown"
 import SearchSelect from "@/components/shadcn-studio/combobox/search-select"
 import { StudioInput } from "@/components/shadcn-studio/input/studio-input"
@@ -40,6 +41,7 @@ const projectSchema = z.object({
   site_map_link: z.string().optional(),
   business_type_id: z.string().min(1, "Business Type is required"),
   channel_partner_id: z.string().optional(),
+  project_category_id: z.string().optional(),
   priority: z.enum(["LOW", "MEDIUM", "HIGH"]),
   total_amount: z.string().optional(),
   advance_paid: z.string().optional(),
@@ -90,6 +92,7 @@ export function CreateProjectModal({
     site_map_link: "",
     business_type_id: "",
     channel_partner_id: "",
+    project_category_id: "",
     priority: "MEDIUM" as "LOW" | "MEDIUM" | "HIGH",
     total_amount: "",
     advance_paid: "",
@@ -135,6 +138,9 @@ export function CreateProjectModal({
   const { data: channelPartners, isLoading: loadingCP } = useGetChannelPartners(
     user?.vendor_id ? Number(user.vendor_id) : 0
   )
+  const { data: projectCategories, isLoading: loadingPC } = useGetProjectCategories(
+    formData.business_type_id ? Number(formData.business_type_id) : 0
+  )
 
   // Mutations
   const { mutate: createProject, isPending } = useCreateProject()
@@ -152,6 +158,12 @@ export function CreateProjectModal({
       label: cp.name,
     })) || []
 
+  const projectCategoryOptions =
+    projectCategories?.data?.map((cat) => ({
+      value: String(cat.id),
+      label: cat.category_name,
+    })) || []
+
   const priorityOptions = [
     { value: "LOW", label: "Low" },
     { value: "MEDIUM", label: "Medium" },
@@ -163,7 +175,13 @@ export function CreateProjectModal({
     field: string,
     value: string | Date | undefined
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setFormData((prev) => {
+      const next = { ...prev, [field]: value }
+      if (field === "business_type_id") {
+        next.project_category_id = "" // Reset category when business type changes
+      }
+      return next
+    })
   }
 
   const handleSubmit = () => {
@@ -202,6 +220,9 @@ export function CreateProjectModal({
       total_amount: Number(result.data.total_amount) || 0,
       advance_paid: Number(result.data.advance_paid) || 0,
       deadline: result.data.deadline.toISOString(),
+      project_category_id: result.data.project_category_id
+        ? Number(result.data.project_category_id)
+        : 0,
     }
 
     console.log("Creating project with payload:", payload)
@@ -219,6 +240,7 @@ export function CreateProjectModal({
           site_map_link: "",
           business_type_id: "",
           channel_partner_id: "",
+          project_category_id: "",
           priority: "MEDIUM",
           total_amount: "",
           advance_paid: "",
@@ -407,7 +429,7 @@ export function CreateProjectModal({
               />
             </div>
 
-            {/* Row 4: Business Type & Priority */}
+            {/* Row 4: Business Type & Project Category */}
             <div className="space-y-3">
               <SearchSelect
                 label="Business Type *"
@@ -420,6 +442,24 @@ export function CreateProjectModal({
                 error={errors.business_type_id}
               />
             </div>
+            {formData.business_type_id ? (
+              <div className="space-y-3">
+                <SearchSelect
+                  label="Project Category"
+                  placeholder={loadingPC ? "Loading..." : "Select project category"}
+                  options={projectCategoryOptions}
+                  value={formData.project_category_id}
+                  onValueChange={(val) =>
+                    handleInputChange("project_category_id", val)
+                  }
+                  error={errors.project_category_id}
+                />
+              </div>
+            ) : (
+              <div className="hidden md:block" />
+            )}
+
+            {/* Row 5: Priority & Project Deadline */}
             <div className="space-y-3">
               <SearchSelect
                 label="Priority *"
@@ -432,8 +472,6 @@ export function CreateProjectModal({
                 error={errors.priority}
               />
             </div>
-
-            {/* Row 5: Project Deadline */}
             <div className="space-y-3">
               <DateInput
                 label="Project Deadline *"
@@ -443,7 +481,6 @@ export function CreateProjectModal({
                 error={errors.deadline}
               />
             </div>
-            <div className="hidden md:block" />
 
             {/* Row 6: Total Amount & Advance Paid */}
             <div className="space-y-3">

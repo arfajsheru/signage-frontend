@@ -2,6 +2,7 @@ import apiClient from "@/lib/api-client"
 import {
   GetBusinessTypesResponse,
   GetChannelPartnersResponse,
+  GetProjectCategoriesResponse,
   GetStageTypesResponse,
 } from "@/types/dropdown.types"
 
@@ -26,4 +27,14 @@ export const dropdownService = {
 
     return response.data
   },
+
+  getProjectCategories: async (
+  business_type_id: number
+): Promise<GetProjectCategoriesResponse>  => {
+  const response = await apiClient.get(
+    `/api/v1/projects/category-list/${business_type_id}`
+  )
+
+  return response.data
+},
 }
