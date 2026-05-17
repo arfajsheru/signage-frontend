@@ -1,7 +1,7 @@
-  "use client"
+"use client"
 
 import { useState, useCallback } from "react"
-import { Plus, Search, Trash2, Eye, Pencil, Filter, X, RefreshCw } from "lucide-react"
+import { Plus, Search, Trash2, Eye, Pencil, X, RefreshCw, MapPin, Calendar, Clock, Hash, User, Phone, Mail, Sparkles } from "lucide-react"
 import { toast } from "sonner"
 
 import ButtonShineHover from "@/components/shadcn-studio/button/button-41"
@@ -25,6 +25,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetDescription,
+} from "@/components/ui/sheet"
 import { useGetProjects, useDeleteProject } from "@/hooks/use-project"
 import { Project, GetProjectsParams } from "@/types/project.types"
 import { cn } from "@/lib/utils"
@@ -335,6 +342,7 @@ function ActionButtons({ project, onView, onEdit, onDelete }: ActionButtonsProps
 
 export default function AllProjectsPage() {
   const [modalType, setModalType] = useState<"signage" | "print" | null>(null)
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null)
 
   // Filters & pagination state
   const [search, setSearch] = useState("")
@@ -390,8 +398,7 @@ export default function AllProjectsPage() {
   }, [])
 
   const handleView = useCallback((project: Project) => {
-    // TODO: navigate to project detail page
-    toast.info(`Viewing: ${project.name}`)
+    setSelectedProject(project)
   }, [])
 
   const handleEdit = useCallback((project: Project) => {
@@ -407,6 +414,8 @@ export default function AllProjectsPage() {
     })
   }, [deleteProject])
 
+  const STATUS_CFG = STATUS_MAP[selectedProject?.status ?? ""] ?? { label: selectedProject?.status ?? "", className: "" }
+
   return (
     <div className="space-y-5">
       {/* Create modal */}
@@ -417,6 +426,108 @@ export default function AllProjectsPage() {
           type={modalType}
         />
       )}
+
+      {/* Project Detail Slide Panel */}
+      <Sheet open={!!selectedProject} onOpenChange={(open) => !open && setSelectedProject(null)}>
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-lg p-0 gap-0 flex flex-col"
+          showCloseButton={false}
+        >
+          {selectedProject && (
+            <>
+              {/* Panel Header with gradient */}
+              <div className="relative overflow-hidden border-b border-border/60">
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent" />
+                {/* dot grid */}
+                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle, currentColor 1px, transparent 1px)", backgroundSize: "18px 18px" }} />
+                <div className="relative px-6 pt-5 pb-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="font-mono text-xs font-bold text-primary bg-primary/10 border border-primary/20 rounded px-1.5 py-0.5">
+                          {selectedProject.project_code}
+                        </span>
+                        <span className={cn(
+                          "inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold",
+                          STATUS_CFG.className
+                        )}>
+                          {STATUS_CFG.label}
+                        </span>
+                      </div>
+                      <SheetTitle className="text-lg font-bold leading-tight text-foreground">
+                        {selectedProject.name}
+                      </SheetTitle>
+                      <SheetDescription className="text-sm text-muted-foreground mt-0.5">
+                        {selectedProject.client_name}
+                      </SheetDescription>
+                    </div>
+                    <button
+                      onClick={() => setSelectedProject(null)}
+                      className="shrink-0 h-8 w-8 rounded-lg border border-border bg-background/80 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-all"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Coming Soon Body */}
+              <div className="flex-1 flex flex-col items-center justify-center gap-5 px-6 py-12">
+                {/* Animated glow orb */}
+                <div className="relative">
+                  <div className="h-24 w-24 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 border border-primary/20 flex items-center justify-center shadow-xl shadow-primary/10">
+                    <Sparkles className="h-10 w-10 text-primary/60" />
+                  </div>
+                  <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/30 animate-ping" />
+                  <div className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-primary/50" />
+                </div>
+
+                <div className="text-center space-y-2 max-w-xs">
+                  <p className="text-base font-bold text-foreground">Coming Soon</p>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
+                    Project details page is under development. Full production tracking, stage timelines, documents, and financials will be available here.
+                  </p>
+                </div>
+
+                {/* Quick Info Cards */}
+                <div className="w-full grid grid-cols-2 gap-2.5 mt-2">
+                  {[
+                    { icon: User, label: "Client", value: selectedProject.client_name },
+                    { icon: Phone, label: "Phone", value: selectedProject.client_phone || "—" },
+                    { icon: Mail, label: "Email", value: selectedProject.client_email || "—" },
+                    { icon: Calendar, label: "Deadline", value: selectedProject.deadline ? new Date(selectedProject.deadline).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—" },
+                    { icon: Hash, label: "Amount", value: new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(selectedProject.total_amount) },
+                    { icon: Clock, label: "Created", value: new Date(selectedProject.created_at).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) },
+                  ].map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="rounded-xl border border-border/60 bg-muted/30 px-3.5 py-3 flex items-start gap-2.5">
+                      <div className="h-7 w-7 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+                        <Icon className="h-3.5 w-3.5 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
+                        <p className="text-xs font-semibold text-foreground truncate mt-0.5">{value}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {selectedProject.site_map_link && (
+                  <a
+                    href={selectedProject.site_map_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 py-2.5 text-sm font-semibold text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-150 shadow-sm"
+                  >
+                    <MapPin className="h-4 w-4" />
+                    Open Site Location
+                  </a>
+                )}
+              </div>
+            </>
+          )}
+        </SheetContent>
+      </Sheet>
 
       {/* Page Header */}
       <div className="flex items-start justify-between gap-4">
