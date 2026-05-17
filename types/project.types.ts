@@ -14,6 +14,7 @@ export interface CreateProjectPayload {
   total_amount: number
   advance_paid: number
   deadline: string
+  project_source: "DIRECT" | "CHANNEL_PARTNER"
 }
 
 export interface Project {
@@ -41,6 +42,7 @@ export interface Project {
   deadline: string
   created_by: number
   is_active: boolean
+  project_source: "DIRECT" | "CHANNEL_PARTNER"
   created_at: string
   updated_at: string
 }
@@ -49,4 +51,49 @@ export interface CreateProjectResponse {
   success: boolean
   message: string
   data: Project
+}
+
+
+
+
+
+export interface GetProjectsParams {
+  page?: number
+  limit?: number
+  search?: string
+
+  business_type_id?: number
+  channel_partner_id?: number
+  project_category_id?: number
+
+  priority?: "LOW" | "MEDIUM" | "HIGH" | "URGENT"
+
+  status?:
+    | "CREATED"
+    | "ACTIVE"
+    | "IN_PROGRESS"
+    | "COMPLETED"
+    | "CANCELLED"
+    | "ON_HOLD"
+
+  created_by?: number
+
+  sortBy?: string
+
+  sortOrder?: "asc" | "desc"
+  project_source?: "DIRECT" | "CHANNEL_PARTNER"
+}
+
+export interface ProjectMeta {
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface GetProjectsResponse {
+  success: boolean
+  message: string
+  data: Project[]
+  meta: ProjectMeta
 }

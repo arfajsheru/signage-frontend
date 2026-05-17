@@ -58,20 +58,20 @@ const data = {
     },
     {
       title: "Projects",
-      url: "/projects",
+      url: "/production/projects",
       icon: <Briefcase />,
       items: [
         {
           title: "All Projects",
-          url: "/projects",
+          url: "/production/projects",
         },
         {
           title: "Active Production",
-          url: "/projects/active",
+          url: "/production/projects/active",
         },
         {
           title: "Timeline",
-          url: "/projects/timeline",
+          url: "/production/projects/timeline",
         },
       ],
     },

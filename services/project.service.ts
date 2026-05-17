@@ -1,5 +1,5 @@
 import apiClient from "@/lib/api-client"
-import { CreateProjectPayload, CreateProjectResponse } from "@/types/project.types"
+import { CreateProjectPayload, CreateProjectResponse, GetProjectsParams, GetProjectsResponse } from "@/types/project.types"
 
 export const projectService = {
   createProject: async (
@@ -12,4 +12,21 @@ export const projectService = {
 
     return response.data
   },
+
+
+
+  getProjects: async (
+  params: GetProjectsParams
+): Promise<GetProjectsResponse> => {
+  const response = await apiClient.get(
+    "/api/v1/projects/project-list",
+    {
+      params,
+    }
+  )
+
+  return response.data
+},
+
+
 }

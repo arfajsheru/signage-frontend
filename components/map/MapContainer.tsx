@@ -28,7 +28,7 @@ export const MapContainer = ({
   hideSearch = false,
   hideCard = false,
 }: {
-  onLocationSelect: (address: string) => void
+  onLocationSelect: (address: string, googleMapsLink?: string) => void
   hideSearch?: boolean
   hideCard?: boolean
 }) => {
@@ -177,7 +177,7 @@ export const MapContainer = ({
 
   const handleConfirm = () => {
     if (selectedLocation && !isOutsideMumbai) {
-      onLocationSelect(selectedLocation.address)
+      onLocationSelect(selectedLocation.address, selectedLocation.googleMapsLink)
     }
   }
 

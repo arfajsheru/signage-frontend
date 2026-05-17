@@ -14,7 +14,7 @@ import { useJsApiLoader } from "@react-google-maps/api"
 interface MapModalProps {
   isOpen: boolean
   onClose: () => void
-  onLocationSelect: (address: string) => void
+  onLocationSelect: (address: string, googleMapsLink?: string) => void
 }
 
 const libraries: ("places" | "geometry" | "drawing" | "visualization")[] = ["places"]
@@ -80,7 +80,7 @@ export const MapModal = ({ isOpen, onClose, onLocationSelect }: MapModalProps) =
 
   const handleConfirm = () => {
     if (selectedLocation && !isOutsideMumbai) {
-      onLocationSelect(selectedLocation.address)
+      onLocationSelect(selectedLocation.address, selectedLocation.googleMapsLink)
       onClose()
     }
   }
@@ -156,8 +156,8 @@ export const MapModal = ({ isOpen, onClose, onLocationSelect }: MapModalProps) =
           <MapContainer 
             hideSearch={true}
             hideCard={true}
-            onLocationSelect={(address) => {
-              onLocationSelect(address)
+            onLocationSelect={(address, googleMapsLink) => {
+              onLocationSelect(address, googleMapsLink)
               onClose()
             }} 
           />

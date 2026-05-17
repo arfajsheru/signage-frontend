@@ -64,13 +64,13 @@ export const BaseModal = ({
         )}
       >
         {/* Header section (Sticky) */}
-        <div className="flex shrink-0 items-start justify-between p-6 pb-4 border-b">
-          <div className="space-y-1 pr-8 text-left">
-            <DialogTitle className="text-xl font-semibold leading-none tracking-tight">
+        <div className="shrink-0 px-6 py-4 border-b relative">
+          <div className="space-y-1 pr-10 text-left">
+            <DialogTitle className="text-lg font-semibold leading-none tracking-tight">
               {title}
             </DialogTitle>
             {description && (
-              <DialogDescription className="text-sm text-muted-foreground mt-1.5 leading-relaxed">
+              <DialogDescription className="text-xs text-muted-foreground mt-1 leading-relaxed line-clamp-1">
                 {description}
               </DialogDescription>
             )}
@@ -79,7 +79,7 @@ export const BaseModal = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full opacity-70 transition-opacity hover:opacity-100 focus:outline-none"
+              className="absolute right-3 top-3 h-8 w-8 rounded-full opacity-70 transition-opacity hover:opacity-100 focus:outline-none hover:bg-muted"
             >
               <X className="h-4 w-4" />
               <span className="sr-only">Close</span>
@@ -97,14 +97,14 @@ export const BaseModal = ({
         </ScrollArea>
 
         {/* Footer section (Sticky) */}
-        <div className="shrink-0 p-6 pt-4 border-t bg-muted/5">
-          <DialogFooter className="flex flex-row items-center justify-end gap-3">
+        <div className="shrink-0 px-6 py-4 border-t bg-muted/5">
+          <DialogFooter className="flex flex-row items-center justify-end gap-2">
             {secondaryButtonText && (
               <Button
                 type="button"
                 variant="outline"
                 onClick={onSecondaryAction || onClose}
-                className="h-10 px-6 font-medium"
+                className="h-9 px-4 font-medium text-sm"
               >
                 {secondaryButtonText}
               </Button>
@@ -113,7 +113,7 @@ export const BaseModal = ({
               <Button
                 type="button"
                 onClick={onPrimaryAction}
-                className="h-10 px-6 font-medium shadow-sm transition-all hover:shadow-md"
+                className="h-9 px-4 font-medium text-sm shadow-sm"
               >
                 {primaryButtonText}
               </Button>
