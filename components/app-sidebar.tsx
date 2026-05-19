@@ -31,6 +31,7 @@ import {
 import { useLogout } from "@/hooks/use-auth"
 import {
   LayoutDashboard,
+  FileText,
   Briefcase,
   Hammer,
   Printer,
@@ -58,6 +59,7 @@ import { cn } from "@/lib/utils"
 // ── Nav Data ──────────────────────────────────────────────────────────────────
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "DXF Extractor", url: "/production/quotation-generator", icon: FileText },
   {
     title: "Projects",
     url: "/production/projects",
